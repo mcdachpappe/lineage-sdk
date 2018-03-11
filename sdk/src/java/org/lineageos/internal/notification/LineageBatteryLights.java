@@ -50,6 +50,7 @@ public final class LineageBatteryLights {
     private int mBatteryLowARGB;
     private int mBatteryMediumARGB;
     private int mBatteryFullARGB;
+    private int mBatteryReallyFullARGB;
     private int mBatteryBrightness;
     private int mBatteryBrightnessZen;
 
@@ -141,9 +142,15 @@ public final class LineageBatteryLights {
         } else if (status == BatteryManager.BATTERY_STATUS_CHARGING
                 || status == BatteryManager.BATTERY_STATUS_FULL) {
             if (status == BatteryManager.BATTERY_STATUS_FULL || level >= 90) {
+                if (level == 100){
+                        // Battery is really full
+                        ledValues.setColor(mBatteryReallyFullARGB);
+                        ledValues.setSolid();
+                } else {
                 // Battery is full or charging and nearly full.
                 ledValues.setColor(mBatteryFullARGB);
                 ledValues.setSolid();
+                }
             } else {
                 // Battery is charging and not nearly full.
                 ledValues.setColor(mBatteryMediumARGB);
@@ -200,6 +207,9 @@ public final class LineageBatteryLights {
                 resolver.registerContentObserver(LineageSettings.System.getUriFor(
                         LineageSettings.System.BATTERY_LIGHT_FULL_COLOR), false, this,
                         UserHandle.USER_ALL);
+                resolver.registerContentObserver(LineageSettings.System.getUriFor(
+                        LineageSettings.System.BATTERY_LIGHT_REALLY_FULL_COLOR), false, this,
+                        UserHandle.USER_ALL);
                 // Battery brightness level
                 resolver.registerContentObserver(LineageSettings.System.getUriFor(
                         LineageSettings.System.BATTERY_LIGHT_BRIGHTNESS_LEVEL), false, this,
@@ -239,6 +249,9 @@ public final class LineageBatteryLights {
                     com.android.internal.R.integer.config_notificationsBatteryMediumARGB));
             mBatteryFullARGB = LineageSettings.System.getInt(resolver,
                     LineageSettings.System.BATTERY_LIGHT_FULL_COLOR, res.getInteger(
+                    com.android.internal.R.integer.config_notificationsBatteryFullARGB));
+            mBatteryReallyFullARGB = LineageSettings.System.getInt(resolver,
+                    LineageSettings.System.BATTERY_LIGHT_REALLY_FULL_COLOR, res.getInteger(
                     com.android.internal.R.integer.config_notificationsBatteryFullARGB));
 
             if (mMultiColorLed) {
